@@ -1,3 +1,4 @@
+import string 
 class Voter:        
     def __init__ (self, winner, loser):
         self.data=[]
@@ -42,29 +43,33 @@ class Voter:
 
 
 voters = []
-
-def initVoters():
-    V1= Voter ("C1", "D1")
-    V2= Voter ("C1", "D1")
-    V3= Voter ("C1", "D2")
-    V4= Voter ("D2", "C1")
-    global voters
-    voters = [V1, V2, V3, V4]
-    
 contestantWIN={}
 contestantLOSE={}
 
-def createContestants(num):
-    print num
-    """initializes the dictionaries for contestantWIN and LOSE to contain the correct number of Cats and Dogs
-    int num is taken in as a parameter to designate the total number of 1 type of animal"""
+
+def initVoter(win, loss):
+    """creates an instance of object Voter.
+    Takes in their win/ loss preferences (as strings)
+    and returns the object Voter after appending the voter
+    to the list of voters (represented by the variable voter)"""
+    V1= Voter (win, loss)
+    voters.append(V1)
+    return V1
+
+
+def createContestantsCATS(num):
+    """initializes the dictionaries for contestantWIN and LOSE for cats to contain the correct number of Cats and Dogs
+    int num is taken in as a parameter to designate the total number of cats"""
     for x in xrange (num):
         contestantWIN["C"+str(x+1)]=0
-        contestantWIN["D"+str(x+1)]=0
         contestantLOSE["C"+str(x+1)]=0
+
+def createContestantsDOGS(num):
+    """initializes the dictionaries for contestantWIN and LOSE for dogs to contain the correct number of Cats and Dogs
+    int num is taken in as a parameter to designate the total number of dogs"""
+    for x in xrange (num):
+        contestantWIN["D"+str(x+1)]=0
         contestantLOSE["D"+str(x+1)]=0
-##    print contestantWIN
-##    print contestantLOSE
 
 def highlander ():
     """I know it's really bad practice to name your methods obscure things,
@@ -90,12 +95,15 @@ def highlander ():
 def iterateThroughChoices():
     """Goes through every combination of winner and loser pet that does not involve
     the same pet winning and losing, prints out the number of voters happy with
-    the best possible result"""
+    the best possible result.  Working on finding an algorithm that doesn't go through
+    all possible combinations of winner and loser... but I'm not really willing to gamble
+    on this returning a wrong answer to ease the NP-Hardness"""
     bestHappiness = 0
     for win in contestantWIN.keys():
         contestantWIN[win]=1
         for lose in contestantLOSE.keys():
             if (win == lose):
+                print"working..."
                 continue
             else:
                 contestantLOSE[lose]=1
@@ -104,7 +112,7 @@ def iterateThroughChoices():
                     bestHappiness = newHappiness
                 contestantLOSE[lose]=0
         contestantWIN[win]=0
-    print bestHappiness
+    return bestHappiness
 
 
 def calculateFitness(win, lose):
@@ -122,11 +130,58 @@ def calculateFitness(win, lose):
     return satisfiedVoters
 
 
-initVoters()  
-createContestants(4)
-print "DONE"
-iterateThroughChoices()
 
+def main ():
+    """Main method.  Runs the show.  Run this to have the whole program work.
+    Takes in nothing and returns nothing"""
+    global voters
+    global contestantWIN
+    global contestantLOSE
+    
+    allSets=[]
+    numSets= int(raw_input ("Enter the number of sets: "))
+    
+    for sets in xrange (numSets):
+        print ""
+        #making the assumption that data will be separated by " ".
+        #This could be updated in later versions. 
+        basicData = raw_input("Enter basic data: ").split(" ")
+        print basicData
 
+        #creating cats
+        createContestantsCATS(int(basicData[0]))
+
+        #creating dogs
+        createContestantsDOGS(int(basicData[1]))
+
+        #creating voters
+        for votes in xrange (int(basicData[2])):
+            vote = string.upper(raw_input ("Enter a vote: ")).split(" ")
+            #creating voters
+            initVoter(vote[0], vote[1])  
+        #saving the data for a single set 
+        setData=[voters, contestantWIN, contestantLOSE]
+        allSets.append(setData)
         
+        #resetting the data structures
+        contestantWIN={}
+        contestantLOSE={}
+        voters=[]
+        setData=[]
+        
+    print "Right!  Let's start calculating"
+
+    #for each one of the sets of data entered 
+    for s in allSets:
+        #reset the global variables 
+        voters = s[0]
+        contestantWIN= s[1]
+        contestantLOSE = s[2]
+        #calculate
+        print iterateThroughChoices()
+           
+main()
+    
+    
+    
 
