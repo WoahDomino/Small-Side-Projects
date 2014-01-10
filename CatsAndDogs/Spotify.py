@@ -88,12 +88,14 @@ def highlander ():
     return False
 
 def iterateThroughChoices():
-    #for any
-    bestHappiness = 0;
+    """Goes through every combination of winner and loser pet that does not involve
+    the same pet winning and losing, prints out the number of voters happy with
+    the best possible result"""
+    bestHappiness = 0
     for win in contestantWIN.keys():
         contestantWIN[win]=1
         for lose in contestantLOSE.keys():
-            if (win==lose):
+            if (win == lose):
                 continue
             else:
                 contestantLOSE[lose]=1
@@ -106,9 +108,9 @@ def iterateThroughChoices():
 
 
 def calculateFitness(win, lose):
-##    print win
-##    print lose
-##    
+    """Method that takes in the pet IDs of the current combination of
+    winning and losing pets.  Iterates through all of the voters to see how
+    satisfying such an answer would be""" 
     satisfiedVoters=0
     for voter in voters:
         voter.isWinnerMatch(win)
@@ -117,9 +119,8 @@ def calculateFitness(win, lose):
             satisfiedVoters= satisfiedVoters+ 1
             voter.winnerMatch=0
             voter.loserMatch=0
-##    print satisfiedVoters
-##    print""
     return satisfiedVoters
+
 
 initVoters()  
 createContestants(4)
